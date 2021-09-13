@@ -5,6 +5,7 @@
     },
     "dependencies": {
         "bn.js": "^5.2.0",
-        "web3": "^1.5.2"
+        "ethers": "^5.4.6",
+        "web3-utils": "^1.5.2"
     }
 }
