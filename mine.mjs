@@ -21,6 +21,7 @@ if ('claim' in config) {
 
 const provably = new ethers.Contract(config.network.gem_address, ABI_FANTOM_GEM, wallet);
 const mining_target = config.address;
+let nonce = await provably.nonce(mining_target);
 
 /**
  * Take a salt and calls the mine() function the the gem contract.
@@ -65,6 +66,8 @@ async function mine(salt) {
 
             await transaction.wait();
 
+            nonce = nonce.add(1);
+
             console.log(`Done!`)
         } catch (error) {
             console.log('Error', error)
@@ -78,7 +81,6 @@ async function mine(salt) {
  */
 async function getState() {
     const { entropy, difficulty } = await provably.gems(config.gem_type);
-    const nonce = await provably.nonce(mining_target);
     const calulated_difficulty = (BigNumber.from(2)).pow(BigNumber.from(256)).div(BigNumber.from(difficulty));
     return { entropy, difficulty, calulated_difficulty, nonce };
 };
