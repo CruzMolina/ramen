@@ -74,7 +74,7 @@ var _parseNumber = function (arg) {
         return new BN(arg);
     }
     else if (utils.isBigNumber(arg)) {
-        return new BN(arg.toString(10));
+        return new BN(arg.toString());
     }
     else if (utils.isBN(arg)) {
         return arg;
