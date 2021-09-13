@@ -5,8 +5,6 @@ import { randomBytes } from "crypto";
 import { ethers, BigNumber } from "ethers";
 
 import config from './config.json'
-import { soliditySha3 } from "./dirtyhash.js";
-
 import ABI_FANTOM_GEM from "./abi/gem.json";
 
 let wallet;
@@ -87,12 +85,12 @@ async function getState() {
 
 function hash(state) {
     const salt = BigNumber.from(`0x${(randomBytes(32)).toString("hex")}`);
-    const result = BigNumber.from(`0x${soliditySha3({ t: "uint256", v: config.network.chain_id },
-        { t: "bytes32", v: state.entropy }, { t: "address", v: config.network.gem_address },
-        { t: "address", v: mining_target },
-        { t: "uint", v: config.gem_type },
-        { t: "uint", v: state.nonce },
-        { t: "uint", v: salt }
+    const result = BigNumber.from(`0x${ethers.utils.solidityKeccak256(["uint256",
+        "bytes32", "address",
+        "address",
+        "uint",
+        "uint",
+        "uint"], [config.network.chain_id, state.entropy, config.network.gem_address, mining_target, config.gem_type, state.nonce, salt]
     ).slice(2)}`);
 
     return { salt, result }
