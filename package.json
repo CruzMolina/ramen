@@ -4,6 +4,11 @@
         "debug": "node --experimental-json-modules mine.mjs"
     },
     "dependencies": {
-        "ethers": "^5.4.6"
+        "@ethersproject/bignumber": "^5.4.1",
+        "@ethersproject/contracts": "^5.4.1",
+        "@ethersproject/providers": "^5.4.5",
+        "@ethersproject/solidity": "^5.4.0",
+        "@ethersproject/units": "^5.4.0",
+        "@ethersproject/wallet": "^5.4.0"
     }
 }

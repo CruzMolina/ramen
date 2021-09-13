@@ -1,23 +1,27 @@
 // A tool to explore caves, adventure, and find riches.
 // https://github.com/dmptrluke/ramen
 
+import { BigNumber } from "@ethersproject/bignumber"
+import { Contract } from "@ethersproject/contracts"
+import { JsonRpcProvider } from "@ethersproject/providers";
+import { keccak256 } from "@ethersproject/solidity";
+import { parseUnits } from "@ethersproject/units";
+import { Wallet } from "@ethersproject/wallet"
 import { randomBytes } from "crypto";
-import { ethers, BigNumber } from "ethers";
 
 import config from './config.json'
 import ABI_FANTOM_GEM from "./abi/gem.json";
 
 let wallet;
 
-const { parseUnits } = ethers.utils;
-const provider = new ethers.providers.JsonRpcProvider(config.network.rpc);
+const provider = new JsonRpcProvider(config.network.rpc);
 
 // if auto-claim is enabled, load the users private key
 if ('claim' in config) {
-    wallet = new ethers.Wallet(config.claim.private_key, provider);
+    wallet = new Wallet(config.claim.private_key, provider);
 }
 
-const provably = new ethers.Contract(config.network.gem_address, ABI_FANTOM_GEM, wallet);
+const provably = new Contract(config.network.gem_address, ABI_FANTOM_GEM, wallet);
 const mining_target = config.address;
 let nonce = await provably.nonce(mining_target);
 
@@ -85,7 +89,7 @@ async function getState() {
 
 function hash(state) {
     const salt = BigNumber.from(`0x${(randomBytes(32)).toString("hex")}`);
-    const result = BigNumber.from(`0x${ethers.utils.solidityKeccak256(["uint256",
+    const result = BigNumber.from(`0x${keccak256(["uint256",
         "bytes32", "address",
         "address",
         "uint",
