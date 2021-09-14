@@ -1,6 +1,6 @@
 {
     "scripts": {
-        "start": "node --experimental-json-modules --no-warnings mine.mjs",
+        "start": "node --experimental-json-modules --no-warnings index.mjs",
         "debug": "node --experimental-json-modules mine.mjs"
     },
     "dependencies": {
@@ -9,6 +9,7 @@
         "@ethersproject/providers": "^5.4.5",
         "@ethersproject/solidity": "^5.4.0",
         "@ethersproject/units": "^5.4.0",
-        "@ethersproject/wallet": "^5.4.0"
+        "@ethersproject/wallet": "^5.4.0",
+        "bluebird": "^3.7.2"
     }
 }

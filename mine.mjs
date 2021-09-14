@@ -12,6 +12,10 @@ import { randomBytes } from "crypto";
 import config from './config.json'
 import ABI_FANTOM_GEM from "./abi/gem.json";
 
+const value = process.argv[2];
+
+process.stdout.write('Process ' + value + ' beginning.');
+
 let wallet;
 
 const provider = new JsonRpcProvider(config.network.rpc);
@@ -33,10 +37,11 @@ async function mine(salt) {
     try {
         const estimated_gas = await provably.estimateGas.mine(config.gem_type, salt.toString())
 
-        console.log(`Estimated gas required to claim is ${estimated_gas.toString()}.`);
+        process.stdout.write(`Estimated gas required to claim is ${estimated_gas.toString()}.`);
     } catch (error) {
         // if the required gas is over 100k, this gem is probably unminable
-        console.log('The gas required to claim this gem is too high, it is invalid or has already been mined.');
+        process.stdout.write('The gas required to claim this gem is too high, it is invalid or has already been mined.');
+        nonce = nonce.add(1);
         return;
     }
 
@@ -51,7 +56,7 @@ async function mine(salt) {
         }
 
         if (gas_price.gt(max_price)) {
-            console.log(`Current network gas price is ${parseUnits(gas_price.toString(), "gwei")} GWEI, above your price limit of ${parseUnits(max_price.toString(), "Gwei")} GWEI. Not claiming.`);
+            process.stdout.write(`Current network gas price is ${parseUnits(gas_price.toString(), "gwei")} GWEI, above your price limit of ${parseUnits(max_price.toString(), "Gwei")} GWEI. Not claiming.`);
             return;
         }
 
@@ -63,16 +68,16 @@ async function mine(salt) {
                 gasLimit: 120000
             })
 
-            console.log('Claim transaction submitted...')
-            console.log(`https://ftmscan.com/tx/${transaction.hash}`)
+            process.stdout.write('Claim transaction submitted...')
+            process.stdout.write(`https://ftmscan.com/tx/${transaction.hash}`)
 
             await transaction.wait();
 
             nonce = nonce.add(1);
 
-            console.log(`Done!`)
+            process.stdout.write(`Done!`)
         } catch (error) {
-            console.log('Error', error)
+            process.stdout.write('Error', error)
         }
     }
 }
@@ -103,7 +108,7 @@ function hash(state) {
 let cancel = false;
 
 async function loop() {
-    console.log('You find a new branch of the cave to mine and head in.');
+    process.stdout.write('You find a new branch of the cave to mine and head in.');
 
     // get the inital contract state
     const state = await getState();
@@ -114,20 +119,20 @@ async function loop() {
 
         i += 1;
         if (state.calulated_difficulty.gte(iteration.result)) {
-            console.log(`You stumble upon a vein of type "${config.gem_type}" gems!`);
-            console.log(`KIND: ${config.gem_type} SALT: ${iteration.salt}`);
+            process.stdout.write(`You stumble upon a vein of type "${config.gem_type}" gems!`);
+            process.stdout.write(`KIND: ${config.gem_type} SALT: ${iteration.salt}`);
 
             await mine(iteration.salt);
 
             if (config.ding) {
-                console.log('\u0007');
+                process.stdout.write('\u0007');
             }
             cancel = true;
         }
 
-        if (i % 20000 == 0) {
+        if (i % 2000000 == 0) {
             getState().then((x) => { state = x });
-            console.log(`Iteration: ${i}, Difficulty: ${state.difficulty}`);
+            process.stdout.write(`Iteration: ${i}, Difficulty: ${state.difficulty}`);
         }
 
         if (i % 2000 == 0) {
@@ -139,7 +144,7 @@ async function loop() {
 };
 
 async function main() {
-    console.log(`You venture into the mines in search of gem type "${config.gem_type}"...`);
+    process.stdout.write(`You venture into the mines in search of gem type "${config.gem_type}"...`);
     if (config.loop) {
         while (true) {
             await loop();
