@@ -41,7 +41,8 @@ async function mine(salt) {
     } catch (error) {
         // if the required gas is over 100k, this gem is probably unminable
         process.stdout.write('The gas required to claim this gem is too high, it is invalid or has already been mined.');
-        nonce = nonce.add(1);
+        state = await getState();
+        nonce = await provably.nonce(mining_target);
         return;
     }
 
@@ -73,7 +74,8 @@ async function mine(salt) {
 
             await transaction.wait();
 
-            nonce = nonce.add(1);
+            state = await getState();
+            nonce = await provably.nonce(mining_target);
 
             process.stdout.write(`Done!`)
         } catch (error) {
@@ -130,7 +132,7 @@ async function loop() {
             cancel = true;
         }
 
-        if (i % 2000000 == 0) {
+        if (i % 20000 == 0) {
             getState().then((x) => { state = x });
             process.stdout.write(`Iteration: ${i}, Difficulty: ${state.difficulty}`);
         }
